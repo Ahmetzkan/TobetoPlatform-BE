@@ -4,19 +4,17 @@ namespace Business.Messages;
 
 public class BusinessMessages
 {
-    public static string DataNotFound = "Veri bulunamadı.";
-    public static string DataAvailable = "Bu veri kullanılmaktadır.";
-    public static string NotAssignedToOccupationClass = "Henüz bir sınıfa atanmadınız.";
-    public static string JoinedSession = "Daha önce bu oturuma katıldınız.";
-
-
+    public static string DataNotFound = "Data is not found.";
+    public static string DataAvailable = "This data is in use.";
+    public static string NotAssignedToOccupationClass = "You have not been assigned to a class yet.";
+    public static string JoinedSession = "You have attended this session before.";
 
 
     //User,Authorization
-    public static string UserNotFound = "Kullanıcı bulunamadı.";
-    public static string SuccessfulLogin = "Giriş başarılı.";
-    public static string UserAlreadyExists = "Kullanıcı mevcuttur.";
-    public static string UserRegistered = "Kayıt başarılı.";
-    public static string AccessTokenCreated = "Token üretildi.";
-    public static string AuthorizationDenied = "Yetkin yok.";
+    public static string UserNotFound = "User not found.";
+    public static string SuccessfulLogin = "Login is succesful.";
+    public static string UserAlreadyExists = "User already exists.";
+    public static string UserRegistered = "Register is succesful.";
+    public static string AccessTokenCreated = "Token is created.";
+    public static string AuthorizationDenied = "You dont have a authorization.";
 }

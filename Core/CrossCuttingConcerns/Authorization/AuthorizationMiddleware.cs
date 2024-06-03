@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http.Features;
 using AuthorizationException = Core.CrossCuttingConcerns.Exceptions.HttpProblemDetails.Types.AuthorizationException;
 
 
-public class AuthorizationMiddleware
+public class AuthorizationMiddleware 
 {
     private readonly RequestDelegate _next;
     private readonly IHttpContextAccessor _httpContextAccessor;

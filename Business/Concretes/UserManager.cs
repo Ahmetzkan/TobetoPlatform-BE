@@ -37,19 +37,42 @@ public class UserManager : IUserService
     public async Task<UpdatedUserResponse> UpdateAsync(UpdateUserRequest updateUserRequest)
     {
         await _userBusinessRules.IsExistsUser(updateUserRequest.Id);
-        User user = _mapper.Map<User>(updateUserRequest);
+        User user = await _userDal.GetAsync(predicate: u => u.Id == updateUserRequest.Id, enableTracking: false);
 
+        User mappedUpdateUser = _mapper.Map<User>(updateUserRequest);
+        mappedUpdateUser.Password = user.Password;
+        mappedUpdateUser.PasswordSalt = user.PasswordSalt;
+        mappedUpdateUser.PasswordHash = user.PasswordHash;
+        mappedUpdateUser.PasswordReset = user.PasswordReset;
+        mappedUpdateUser.Status = user.Status;
+
+        var updatedUser = await _userDal.UpdateAsync(mappedUpdateUser);
+        UpdatedUserResponse mappedUser = _mapper.Map<UpdatedUserResponse>(updatedUser);
+        return mappedUser;
+    }
+
+    public async Task<UpdatedUserResponse> UpdateResetTokenAsync(ResetTokenUserRequest resetTokenUserRequest)
+    {
+        await _userBusinessRules.IsExistsUser(resetTokenUserRequest.UserId);
+        User user = await _userDal.GetAsync(predicate: u => u.Id == resetTokenUserRequest.UserId, enableTracking: false);
+        user.PasswordReset = resetTokenUserRequest.ResetToken;
         var updatedUser = await _userDal.UpdateAsync(user);
         UpdatedUserResponse mappedUser = _mapper.Map<UpdatedUserResponse>(updatedUser);
         return mappedUser;
     }
 
-
-
-    public async Task<DeletedUserResponse> DeleteAsync(DeleteUserRequest deleteUserRequest)
+    public async Task<UpdatedUserResponse> UpdatePasswordAsync(User user)
     {
-        await _userBusinessRules.IsExistsUser(deleteUserRequest.Id);
-        User user = await _userDal.GetAsync(predicate: u => u.Id == deleteUserRequest.Id);
+        await _userBusinessRules.IsExistsUser(user.Id);
+        var updatedUser = await _userDal.UpdateAsync(user);
+        UpdatedUserResponse mappedUser = _mapper.Map<UpdatedUserResponse>(updatedUser);
+        return mappedUser;
+    }
+
+    public async Task<DeletedUserResponse> DeleteAsync(Guid id)
+    {
+        await _userBusinessRules.IsExistsUser(id);
+        User user = await _userDal.GetAsync(predicate: u => u.Id == id);
         User deletedUser = await _userDal.DeleteAsync(user);
         DeletedUserResponse responseUser = _mapper.Map<DeletedUserResponse>(deletedUser);
         return responseUser;

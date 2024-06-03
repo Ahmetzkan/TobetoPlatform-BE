@@ -27,8 +27,8 @@ public class UserProfile : Profile
         CreateMap<User, GetUserResponse>().ReverseMap();
 
         CreateMap<GetListUserResponse, User>()
-.ReverseMap()
-     .ForMember(dest => dest.RoleName,
+        .ReverseMap()
+        .ForMember(dest => dest.RoleName,
                 opt => opt.MapFrom(src => string.Join(", ", src.UserOperationClaims.Select(uopc => uopc.OperationClaim.Name))));
 
 

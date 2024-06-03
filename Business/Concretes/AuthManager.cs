@@ -108,15 +108,28 @@ public class AuthManager : IAuthService
     {
         byte[] passwordHash, passwordSalt;
         var userResponse = await _userService.GetByIdAsync(changePasswordRequest.UserId);
-
+        HashingHelper.VerifyPasswordHash(changePasswordRequest.OldPassword, userResponse.PasswordHash, userResponse.PasswordSalt);
         HashingHelper.CreatePasswordHash(changePasswordRequest.NewPassword, out passwordHash, out passwordSalt);
 
         User user = _mapper.Map<User>(userResponse);
         user.PasswordHash = passwordHash;
         user.PasswordSalt = passwordSalt;
+        user.Password = changePasswordRequest.NewPassword;
 
-        var mappedUser = _mapper.Map<UpdateUserRequest>(user);
-        await _userService.UpdateAsync(mappedUser);
+        await _userService.UpdatePasswordAsync(user);
+    }
+
+    public async Task ChangeForgotPassword(ResetPasswordRequest resetPasswordRequest)
+    {
+        byte[] passwordHash, passwordSalt;
+        var userResponse = await _userService.GetByIdAsync(resetPasswordRequest.UserId);
+        HashingHelper.CreatePasswordHash(resetPasswordRequest.NewPassword, out passwordHash, out passwordSalt);
+        User user = _mapper.Map<User>(userResponse);
+        user.PasswordHash = passwordHash;
+        user.PasswordSalt = passwordSalt;
+        user.Password = resetPasswordRequest.NewPassword;
+
+        await _userService.UpdatePasswordAsync(user);
     }
 
     public async Task<bool> PasswordResetAsync(string email)
@@ -138,11 +151,10 @@ public class AuthManager : IAuthService
             ResetToken = resetToken.Token,
             To = email
         };
+        ResetTokenUserRequest userPasswordReset = _mapper.Map<ResetTokenUserRequest>(mappedUser);
+        userPasswordReset.ResetToken = resetToken.Token;
 
-        UpdateUserRequest updateUserRequest = _mapper.Map<UpdateUserRequest>(mappedUser);
-        updateUserRequest.PasswordReset = resetToken.Token;
-
-        await _userService.UpdateAsync(updateUserRequest);
+        await _userService.UpdateResetTokenAsync(userPasswordReset);
         await _mailService.SendPasswordResetMailAsync(sendPasswordResetMailRequest);
 
         return true;

@@ -31,7 +31,7 @@ public class UsersController : ControllerBase
         return Ok(result);
     }
 
-  
+
 
     [Logging(typeof(MsSqlLogger))]
     [Logging(typeof(FileLogger))]
@@ -70,7 +70,7 @@ public class UsersController : ControllerBase
     [Logging(typeof(FileLogger))]
     [CacheRemove("Users.Get")]
     [CustomValidation(typeof(CreateUserRequestValidator))]
-    [HttpPost("Add")]
+    [HttpPost]
     public async Task<IActionResult> AddAsync([FromBody] CreateUserRequest createUserRequest)
     {
         var result = await _userService.AddAsync(createUserRequest);
@@ -82,7 +82,7 @@ public class UsersController : ControllerBase
     [Logging(typeof(FileLogger))]
     [CacheRemove("Users.Get")]
     [CustomValidation(typeof(UpdateUserRequestValidator))]
-    [HttpPost("Update")]
+    [HttpPut]
     public async Task<IActionResult> UpdateAsync([FromBody] UpdateUserRequest updateUserRequest)
     {
         var result = await _userService.UpdateAsync(updateUserRequest);
@@ -93,10 +93,22 @@ public class UsersController : ControllerBase
     [Logging(typeof(MsSqlLogger))]
     [Logging(typeof(FileLogger))]
     [CacheRemove("Users.Get")]
-    [HttpPost("Delete")]
-    public async Task<IActionResult> DeleteAsync([FromBody] DeleteUserRequest deleteProductRequest)
+    [CustomValidation(typeof(UpdateUserRequestValidator))]
+    [HttpPut("UpdateResetToken")]
+    public async Task<IActionResult> UpdateResetTokenAsync([FromBody] ResetTokenUserRequest resetTokenUserRequest)
     {
-        var result = await _userService.DeleteAsync(deleteProductRequest);
+        var result = await _userService.UpdateResetTokenAsync(resetTokenUserRequest);
+        return Ok(result);
+    }
+
+
+    [Logging(typeof(MsSqlLogger))]
+    [Logging(typeof(FileLogger))]
+    [CacheRemove("Users.Get")]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteAsync([FromRoute] Guid id)
+    {
+        var result = await _userService.DeleteAsync(id);
         return Ok(result);
     }
 
@@ -104,7 +116,7 @@ public class UsersController : ControllerBase
     [Logging(typeof(FileLogger))]
     [Cache(10)]
     [HttpPost("GetByResetToken")]
-    public async Task<IActionResult>GetByResetTokenAsync([FromBody] ResetTokenUserRequest resetTokenUserRequest)
+    public async Task<IActionResult> GetByResetTokenAsync([FromBody] ResetTokenUserRequest resetTokenUserRequest)
     {
         var result = await _userService.GetByResetTokenAsync(resetTokenUserRequest);
         return Ok(result);
@@ -118,10 +130,6 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> GetByMailAsync([FromQuery] string email)
     {
         var result = await _userService.GetByMailAsync(email);
-            return Ok(result);
+        return Ok(result);
     }
-
-
-
-
 }
